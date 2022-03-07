@@ -1,0 +1,82 @@
+!MainRule       = File;
+!SpaceMethod    = "Whitespace"
+!SpaceDirection = "Both";
+
+File?:                   Declaration,*;
+Declaration?:            EmptyDeclaration;
+                         BlockDeclaration;
+                         OptionDeclaration;
+                         RuleDeclaration;
+                         NodelessRuleDeclaration;
+                         CallbackRuleDeclaration;
+                         Comment;
+EmptyDeclaration?:       ";";
+BlockDeclaration:        "{", Declaration,* "}";
+OptionDeclaration:       "!", Identifier, "=", Value, ";";
+RuleDeclaration:         Identifier, ":", Depth1Matcher, ";";
+NodelessRuleDeclaration: Identifier, "?", ":", Depth1Matcher, ";";
+CallbackRuleDeclaration: Identifier, "!", ";";
+Comment?:                '#.*';
+
+Identifier: '[A-Za-z_][A-Za-z0-9_]*';
+
+# Option values
+Value?:  Identifier;
+         Boolean;
+         Integer;
+         TextMatcher;
+Boolean: "true" | "false";
+Integer: '[0-9]+';
+
+# Matchers
+Depth1Matcher?: Branch;
+                Depth2Matcher;
+Depth2Matcher?: CombinationMatcher;
+                OrMatcher;
+                Depth3Matcher;
+Depth3Matcher?: ZeroOrMore;
+                OneOrMore;
+                ExactAmount;
+                RangeMatcher;
+                OptionalMatcher;
+                NegativeMatcher;
+                Depth4Matcher;
+Depth4Matcher?: LenientSpaceMatcher;
+                ForcedSpaceMatcher;
+                Depth5Matcher;
+Depth5Matcher?: Group;
+                NamedGroupMatcher;
+                NamedGroupReferenceMatcher;
+                ReferenceMatcher;
+                TextMatcher;
+                RegexMatcher;
+
+# Depth 1
+Branch: Depth2Matcher, (";", Depth2Matcher),+;
+
+# Depth 2
+{
+    !SpaceDirection = "Left";
+    CombinationMatcher: Depth3Matcher Depth3Matcher.+;
+}
+OrMatcher: Depth3Matcher, ("|", Depth3Matcher),+;
+
+# Depth 3
+ZeroOrMore:      Depth4Matcher, "*";
+OneOrMore:       Depth4Matcher, "+";
+ExactAmount:     Depth4Matcher, "{", Integer, "}";
+RangeMatcher:    Depth4Matcher, "{", Integer, ",", Integer, "}";
+OptionalMatcher: Depth4Matcher, "?", ~":";
+NegativeMatcher: "~", Depth4Matcher;
+
+# Depth 4
+LenientSpaceMatcher: Depth5Matcher, ",";
+ForcedSpaceMatcher:  Depth5Matcher, ".";
+
+# Depth 5
+Group:                      "(", Depth2Matcher, ")";
+NamedGroupMatcher:          "(", "<", Identifier, ">", ":", Depth2Matcher, ")";
+NamedGroupReferenceMatcher: "\\", Identifier, ~(("!", ";") | ("?",? ":"));
+ReferenceMatcher:           Identifier, ~(("!", ";") | ("?",? ":"));
+TextMatcher:                '\"(?:[^\"\\\\\n]|\\.|\\\\.)*\"';
+RegexMatcher:               '\'(?:[^\'\\\\\n]|\\.|\\\\.)*\'';
