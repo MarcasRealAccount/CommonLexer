@@ -3,6 +3,7 @@ require("Premake/Common")
 require("Premake/Libs/CommonLexer")
 
 require("Premake/ThirdParty/fmt")
+require("ThirdParty/CommonCLI/Premake/Libs/CommonCLI")
 
 workspace("CommonLexer")
 	common:setConfigsAndPlatforms()
@@ -23,6 +24,12 @@ workspace("CommonLexer")
         libs.fmt:setup()
         location("ThirdParty/")
 
+    project("CommonCLI")
+        location("ThirdParty/CommonCLI/")
+        warnings("Off")
+        libs.CommonCLI:setup()
+        location("ThirdParty/")
+
 	group("Libs")
 	project("CommonLexer")
 		location("CommonLexer/")
@@ -38,6 +45,7 @@ workspace("CommonLexer")
 		common:outDirs()
 		common:debugDir()
 
+		libs.CommonCLI:setupDep()
 		libs.CommonLexer:setupDep()
 
 		includedirs({ "%{prj.location}/Src/" })

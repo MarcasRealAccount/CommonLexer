@@ -9,6 +9,9 @@ namespace CommonLexer
 	MatcherRule::MatcherRule(std::string&& name, std::unique_ptr<IMatcher>&& matcher, bool createNode)
 	    : IRule(std::move(name)), m_Matcher(std::move(matcher)), m_CreateNode(createNode) {}
 
+	MatcherRule::MatcherRule(MatcherRule&& move) noexcept
+	    : IRule(std::move(move)), m_Matcher(std::move(move.m_Matcher)), m_CreateNode(move.m_CreateNode) {}
+
 	MatchResult MatcherRule::match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span)
 	{
 		state.setCurrentRule(this, span.m_Start);
@@ -37,6 +40,9 @@ namespace CommonLexer
 
 	CallbackRule::CallbackRule(std::string&& name, Callback&& callback)
 	    : IRule(std::move(name)), m_Callback(std::move(callback)) {}
+
+	CallbackRule::CallbackRule(CallbackRule&& move) noexcept
+	    : IRule(std::move(move)), m_Callback(std::move(move.m_Callback)) {}
 
 	MatchResult CallbackRule::match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span)
 	{

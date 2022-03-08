@@ -31,7 +31,7 @@ namespace CommonLexer
 		static constexpr std::size_t Size = 1 + sizeof...(Ts);
 
 	public:
-		Tuple(T&& value, T&&... values)
+		Tuple(T&& value, Ts&&... values)
 		    : m_Value(std::forward<T>(value)), m_Next(std::forward<Ts>(values)...) {}
 
 	public:

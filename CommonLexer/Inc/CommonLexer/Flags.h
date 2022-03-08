@@ -53,7 +53,7 @@ namespace CommonLexer
 		constexpr         operator ValueT&() { return m_Value; }
 		constexpr ValueT& getValue() { return m_Value; }
 
-		constexpr bool contains(const Flags& flags) { return m_Value & flags.m_Value == flags.m_Value; }
+		constexpr bool contains(const Flags& flags) { return (m_Value & flags.m_Value) == flags.m_Value; }
 
 		friend constexpr Flags operator~(const Flags& flags) { return ~flags.m_Value; }
 		template <class U>

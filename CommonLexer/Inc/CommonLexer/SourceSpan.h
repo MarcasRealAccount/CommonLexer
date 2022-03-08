@@ -86,7 +86,7 @@ namespace CommonLexer
 
 		[[nodiscard]] char operator*() const
 		{
-			if (m_Cache.empty() || m_CacheOffset >= m_CacheOffset)
+			if (m_Cache.empty() || m_CacheOffset >= m_Cache.size())
 				return '\0';
 			return m_Cache[m_CacheOffset];
 		}
@@ -127,12 +127,14 @@ namespace CommonLexer
 			m_Point += count;
 			m_CacheOffset += count;
 			recache();
+			return *this;
 		}
 		SourceIterator& operator-=(std::size_t count)
 		{
 			m_Point -= count;
 			m_CacheOffset -= count;
 			recache();
+			return *this;
 		}
 
 		[[nodiscard]] SourceIterator operator+(std::size_t count)

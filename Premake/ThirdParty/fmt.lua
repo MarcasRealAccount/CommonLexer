@@ -15,6 +15,8 @@ function fmt:setup()
 	kind("Utility")
 	common:outDirs(true)
 
+    defines({ "FMT_HEADER_ONLY" })
+
 	includedirs({ self.location .. "/include/" })
 
 	files({ })
@@ -23,4 +25,6 @@ end
 
 function fmt:setupDep()
 	sysincludedirs({ self.location .. "/include/" })
+
+    defines({ "FMT_HEADER_ONLY" })
 end

@@ -1,3 +1,6 @@
 [submodule "ThirdParty/fmt"]
 	path = ThirdParty/fmt
 	url = https://github.com/fmtlib/fmt.git
+[submodule "ThirdParty/CommonCLI"]
+	path = ThirdParty/CommonCLI
+	url = https://github.com/MarcasRealAccount/CommonCLI.git

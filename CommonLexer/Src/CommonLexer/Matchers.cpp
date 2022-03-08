@@ -11,6 +11,9 @@ namespace CommonLexer
 	CombinationMatcher::CombinationMatcher(std::vector<std::unique_ptr<IMatcher>>&& matchers)
 	    : m_Matchers(std::move(matchers)) {}
 
+	CombinationMatcher::CombinationMatcher(CombinationMatcher&& move) noexcept
+	    : m_Matchers(std::move(move.m_Matchers)) {}
+
 	MatchResult CombinationMatcher::match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span)
 	{
 		SourceSpan subSpan { span };
@@ -33,6 +36,9 @@ namespace CommonLexer
 
 	OrMatcher::OrMatcher(std::vector<std::unique_ptr<IMatcher>>&& matchers)
 	    : m_Matchers(std::move(matchers)) {}
+
+	OrMatcher::OrMatcher(OrMatcher&& move) noexcept
+	    : m_Matchers(std::move(move.m_Matchers)) {}
 
 	MatchResult OrMatcher::match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span)
 	{
@@ -85,6 +91,9 @@ namespace CommonLexer
 	RangeMatcher::RangeMatcher(std::unique_ptr<IMatcher>&& matcher, std::size_t lowerBounds, std::size_t upperBounds)
 	    : m_Matcher(std::move(matcher)), m_LowerBounds(lowerBounds), m_UpperBounds(upperBounds) {}
 
+	RangeMatcher::RangeMatcher(RangeMatcher&& move) noexcept
+	    : m_Matcher(std::move(move.m_Matcher)), m_LowerBounds(move.m_LowerBounds), m_UpperBounds(move.m_UpperBounds) {}
+
 	MatchResult RangeMatcher::match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span)
 	{
 		std::size_t matches { 0 };
@@ -120,6 +129,9 @@ namespace CommonLexer
 	OptionalMatcher::OptionalMatcher(std::unique_ptr<IMatcher>&& matcher)
 	    : m_Matcher(std::move(matcher)) {}
 
+	OptionalMatcher::OptionalMatcher(OptionalMatcher&& move) noexcept
+	    : m_Matcher(std::move(move.m_Matcher)) {}
+
 	MatchResult OptionalMatcher::match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span)
 	{
 		auto result = m_Matcher->match(state, scopedState, span);
@@ -134,6 +146,9 @@ namespace CommonLexer
 
 	NegativeMatcher::NegativeMatcher(std::unique_ptr<IMatcher>&& matcher)
 	    : m_Matcher(std::move(matcher)) {}
+
+	NegativeMatcher::NegativeMatcher(NegativeMatcher&& move) noexcept
+	    : m_Matcher(std::move(move.m_Matcher)) {}
 
 	MatchResult NegativeMatcher::match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span)
 	{
@@ -154,6 +169,9 @@ namespace CommonLexer
 
 	SpaceMatcher::SpaceMatcher(std::unique_ptr<IMatcher>&& matcher, bool forced, SpaceDirectionFlags direction, ESpaceMethod method)
 	    : m_Matcher(std::move(matcher)), m_Forced(forced), m_Direction(direction), m_Method(method) {}
+
+	SpaceMatcher::SpaceMatcher(SpaceMatcher&& move) noexcept
+	    : m_Matcher(std::move(move.m_Matcher)), m_Forced(move.m_Forced), m_Direction(move.m_Direction), m_Method(move.m_Method) {}
 
 	MatchResult SpaceMatcher::match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span)
 	{
@@ -284,7 +302,7 @@ namespace CommonLexer
 
 		if (m_Forced && i == 0)
 		{
-			scopedState.addMessage(fmt::format("Expected space or tab but got '{}'", itr != end ? std::string { *itr } : "EOF"), span.m_Start, SourceSpan { span.m_Start, span.m_Start }, state.m_CurrentRule);
+			scopedState.addMessage(fmt::format("Expected space or tab but got '{}'", itr != end ? std::string { *itr } : "EOF"), span.m_Start, SourceSpan { span.m_Start, span.m_Start }, state.m_CurrentRule->getID());
 		}
 
 		return { EMatchStatus::Success, { span.m_Start, itr } };
@@ -330,7 +348,7 @@ namespace CommonLexer
 
 		if (m_Forced && i == 0)
 		{
-			scopedState.addMessage(fmt::format("Expected space, tab, vertical tab, form feed, carriage return or line feed but got '{}'", itr != end ? std::string { *itr } : "EOF"), span.m_Start, SourceSpan { span.m_Start, span.m_Start }, state.m_CurrentRule);
+			scopedState.addMessage(fmt::format("Expected space, tab, vertical tab, form feed, carriage return or line feed but got '{}'", itr != end ? std::string { *itr } : "EOF"), span.m_Start, SourceSpan { span.m_Start, span.m_Start }, state.m_CurrentRule->getID());
 		}
 
 		return { EMatchStatus::Success, { span.m_Start, itr } };
@@ -338,8 +356,12 @@ namespace CommonLexer
 
 	NamedGroupMatcher::NamedGroupMatcher(const std::string& name, std::unique_ptr<IMatcher>&& matcher)
 	    : m_Name(name), m_Matcher(std::move(matcher)) {}
+
 	NamedGroupMatcher::NamedGroupMatcher(std::string&& name, std::unique_ptr<IMatcher>&& matcher)
 	    : m_Name(std::move(name)), m_Matcher(std::move(matcher)) {}
+
+	NamedGroupMatcher::NamedGroupMatcher(NamedGroupMatcher&& move) noexcept
+	    : m_Name(std::move(move.m_Name)), m_Matcher(std::move(move.m_Matcher)) {}
 
 	MatchResult NamedGroupMatcher::match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span)
 	{
@@ -355,6 +377,9 @@ namespace CommonLexer
 	NamedGroupReferenceMatcher::NamedGroupReferenceMatcher(std::string&& name)
 	    : m_Name(std::move(name)) {}
 
+	NamedGroupReferenceMatcher::NamedGroupReferenceMatcher(NamedGroupReferenceMatcher&& move) noexcept
+	    : m_Name(std::move(move.m_Name)) {}
+
 	MatchResult NamedGroupReferenceMatcher::match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span)
 	{
 		auto groupedSpan = state.getGroupedValue(m_Name);
@@ -369,13 +394,13 @@ namespace CommonLexer
 		{
 			if (itr == end)
 			{
-				scopedState.addMessage(fmt::format("Expected '{}', but got 'EOF'", SourceSpan { textItr, textEnd }.getSpan(state.m_Source)), itr, SourceSpan { span.m_Start, itr }, state.m_CurrentRule);
+				scopedState.addMessage(fmt::format("Expected '{}', but got 'EOF'", SourceSpan { textItr, textEnd }.getSpan(state.m_Source)), itr, SourceSpan { span.m_Start, itr }, state.m_CurrentRule->getID());
 				return { EMatchStatus::Failure, { span.m_Start, itr } };
 			}
 
 			if (*itr != *textItr)
 			{
-				scopedState.addMessage(fmt::format("Expected '{}', but got '{}'", *textItr, *itr), itr, SourceSpan { span.m_Start, itr }, state.m_CurrentRule);
+				scopedState.addMessage(fmt::format("Expected '{}', but got '{}'", *textItr, *itr), itr, SourceSpan { span.m_Start, itr }, state.m_CurrentRule->getID());
 				return { EMatchStatus::Failure, { span.m_Start, itr } };
 			}
 
@@ -389,7 +414,10 @@ namespace CommonLexer
 	    : m_Name(name) {}
 
 	ReferenceMatcher::ReferenceMatcher(std::string&& name)
-	    : m_Name(std::move(name)) {}
+	    : m_Name(std::move(name)), m_Rule(nullptr) {}
+
+	ReferenceMatcher::ReferenceMatcher(ReferenceMatcher&& move) noexcept
+	    : m_Name(std::move(move.m_Name)), m_Rule(nullptr) {}
 
 	MatchResult ReferenceMatcher::match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span)
 	{
@@ -398,7 +426,7 @@ namespace CommonLexer
 			m_Rule = state.m_Lex->getLexer()->getRule(m_Name);
 			if (!m_Rule)
 			{
-				scopedState.addMessage(fmt::format("Expected non existent rule '{}'", m_Name), span.m_Start, SourceSpan { span.m_Start, span.m_Start }, state.m_CurrentRule);
+				scopedState.addMessage(fmt::format("Expected non existent rule '{}'", m_Name), span.m_Start, SourceSpan { span.m_Start, span.m_Start }, state.m_CurrentRule->getID());
 				return { EMatchStatus::Failure, { span.m_Start, span.m_Start } };
 			}
 		}
@@ -412,6 +440,9 @@ namespace CommonLexer
 	TextMatcher::TextMatcher(std::string&& text)
 	    : m_Text(std::move(text)) {}
 
+	TextMatcher::TextMatcher(TextMatcher&& move) noexcept
+	    : m_Text(std::move(move.m_Text)) {}
+
 	MatchResult TextMatcher::match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span)
 	{
 		auto itr = span.begin(state.m_Source);
@@ -424,13 +455,13 @@ namespace CommonLexer
 		{
 			if (itr == end)
 			{
-				scopedState.addMessage(fmt::format("Expected '{}', but got 'EOF'", std::string_view { textItr.operator->(), static_cast<std::size_t>(textEnd - textItr) }), itr, SourceSpan { span.m_Start, itr }, state.m_CurrentRule);
+				scopedState.addMessage(fmt::format("Expected '{}', but got 'EOF'", std::string_view { textItr.operator->(), static_cast<std::size_t>(textEnd - textItr) }), itr, SourceSpan { span.m_Start, itr }, state.m_CurrentRule->getID());
 				return { EMatchStatus::Failure, { span.m_Start, itr } };
 			}
 
 			if (*itr != *textItr)
 			{
-				scopedState.addMessage(fmt::format("Expected '{}', but got '{}'", *textItr, *itr), itr, SourceSpan { span.m_Start, itr }, state.m_CurrentRule);
+				scopedState.addMessage(fmt::format("Expected '{}', but got '{}'", *textItr, *itr), itr, SourceSpan { span.m_Start, itr }, state.m_CurrentRule->getID());
 				return { EMatchStatus::Failure, { span.m_Start, itr } };
 			}
 
@@ -442,15 +473,19 @@ namespace CommonLexer
 
 	RegexMatcher::RegexMatcher(const std::string& regex)
 	    : m_Regex(regex, std::regex_constants::ECMAScript | std::regex_constants::optimize) {}
+
 	RegexMatcher::RegexMatcher(std::string&& regex)
 	    : m_Regex(std::move(regex), std::regex_constants::ECMAScript | std::regex_constants::optimize) {}
+
+	RegexMatcher::RegexMatcher(RegexMatcher&& move) noexcept
+	    : m_Regex(std::move(move.m_Regex)) {}
 
 	MatchResult RegexMatcher::match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span)
 	{
 		std::match_results<SourceIterator> results;
 		if (std::regex_search(span.begin(state.m_Source), span.end(state.m_Source), results, m_Regex, std::regex_constants::match_continuous))
 			return { EMatchStatus::Success, { results[0].first, results[0].second } };
-		scopedState.addMessage("Expected regex to succeed, but failed. Sadly I don't get regex error messages, maybe in the future ;)", span.m_Start, SourceSpan { span.m_Start, span.m_Start }, state.m_CurrentRule);
+		scopedState.addMessage("Expected regex to succeed, but failed. Sadly I don't get regex error messages, maybe in the future ;)", span.m_Start, SourceSpan { span.m_Start, span.m_Start }, state.m_CurrentRule->getID());
 		return { EMatchStatus::Failure, { span.m_Start, span.m_Start } };
 	}
 } // namespace CommonLexer

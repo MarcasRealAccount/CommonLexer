@@ -17,6 +17,7 @@ namespace CommonLexer
 		MatcherRule(std::string&& name, Matcher&& matcher, bool createNode = true);
 		MatcherRule(const std::string& name, std::unique_ptr<IMatcher>&& matcher, bool createNode = true);
 		MatcherRule(std::string&& name, std::unique_ptr<IMatcher>&& matcher, bool createNode = true);
+		MatcherRule(MatcherRule&& move) noexcept;
 
 		virtual MatchResult match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span) override;
 
@@ -34,6 +35,7 @@ namespace CommonLexer
 	public:
 		CallbackRule(const std::string& name, Callback&& callback);
 		CallbackRule(std::string&& name, Callback&& callback);
+		CallbackRule(CallbackRule&& move) noexcept;
 
 		virtual MatchResult match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span) override;
 
@@ -47,13 +49,13 @@ namespace CommonLexer
 
 	template <Matcher Matcher>
 	MatcherRule::MatcherRule(const std::string& name, Matcher&& matcher, bool createNode)
-	    : m_Name(name), m_Matcher(std::make_unique<Matcher>(std::move(matcher))), m_CreateNode(createNode)
+	    : IRule(name), m_Matcher(std::make_unique<Matcher>(std::move(matcher))), m_CreateNode(createNode)
 	{
 	}
 
 	template <Matcher Matcher>
 	MatcherRule::MatcherRule(std::string&& name, Matcher&& matcher, bool createNode)
-	    : m_Name(std::move(name)), m_Matcher(std::make_unique<Matcher>(std::move(matcher))), m_CreateNode(createNode)
+	    : IRule(std::move(name)), m_Matcher(std::make_unique<Matcher>(std::move(matcher))), m_CreateNode(createNode)
 	{
 	}
 } // namespace CommonLexer

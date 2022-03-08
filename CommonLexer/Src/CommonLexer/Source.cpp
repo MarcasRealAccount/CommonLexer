@@ -75,7 +75,7 @@ namespace CommonLexer
 		std::vector<std::string> lns;
 		lns.reserve(lines);
 		for (std::size_t line = startLine, end = startLine + lines; line != end; ++line)
-			lns.push_back(std::move(getLine(line)));
+			lns.push_back(getLine(line));
 		return lns;
 	}
 

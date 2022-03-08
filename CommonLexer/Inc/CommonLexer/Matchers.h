@@ -24,6 +24,7 @@ namespace CommonLexer
 		template <Matcher... Matchers>
 		CombinationMatcher(Tuple<Matchers...>&& matchers);
 		CombinationMatcher(std::vector<std::unique_ptr<IMatcher>>&& matchers);
+		CombinationMatcher(CombinationMatcher&& move) noexcept;
 
 		virtual MatchResult match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span) override;
 
@@ -39,6 +40,7 @@ namespace CommonLexer
 		template <Matcher... Matchers>
 		OrMatcher(Tuple<Matchers...>&& matchers);
 		OrMatcher(std::vector<std::unique_ptr<IMatcher>>&& matchers);
+		OrMatcher(OrMatcher&& move) noexcept;
 
 		virtual MatchResult match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span) override;
 
@@ -56,6 +58,7 @@ namespace CommonLexer
 		template <Matcher Matcher>
 		RangeMatcher(Matcher&& matcher, std::size_t lowerBounds = 0, std::size_t upperBounds = ~0ULL);
 		RangeMatcher(std::unique_ptr<IMatcher>&& matcher, std::size_t lowerBounds = 0, std::size_t upperBounds = ~0ULL);
+		RangeMatcher(RangeMatcher&& move) noexcept;
 
 		virtual MatchResult match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span) override;
 
@@ -72,6 +75,7 @@ namespace CommonLexer
 		template <Matcher Matcher>
 		OptionalMatcher(Matcher&& matcher);
 		OptionalMatcher(std::unique_ptr<IMatcher>&& matcher);
+		OptionalMatcher(OptionalMatcher&& move) noexcept;
 
 		virtual MatchResult match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span) override;
 
@@ -85,6 +89,7 @@ namespace CommonLexer
 		template <Matcher Matcher>
 		NegativeMatcher(Matcher&& matcher);
 		NegativeMatcher(std::unique_ptr<IMatcher>&& matcher);
+		NegativeMatcher(NegativeMatcher&& move) noexcept;
 
 		virtual MatchResult match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span) override;
 
@@ -118,6 +123,7 @@ namespace CommonLexer
 		template <Matcher Matcher>
 		SpaceMatcher(Matcher&& matcher, bool forced = false, SpaceDirectionFlags direction = ESpaceDirection::Right, ESpaceMethod method = ESpaceMethod::Normal);
 		SpaceMatcher(std::unique_ptr<IMatcher>&& matcher, bool forced = false, SpaceDirectionFlags direction = ESpaceDirection::Right, ESpaceMethod method = ESpaceMethod::Normal);
+		SpaceMatcher(SpaceMatcher&& move) noexcept;
 
 		virtual MatchResult match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span) override;
 
@@ -145,6 +151,7 @@ namespace CommonLexer
 		NamedGroupMatcher(std::string&& name, Matcher&& matcher);
 		NamedGroupMatcher(const std::string& name, std::unique_ptr<IMatcher>&& matcher);
 		NamedGroupMatcher(std::string&& name, std::unique_ptr<IMatcher>&& matcher);
+		NamedGroupMatcher(NamedGroupMatcher&& move) noexcept;
 
 		virtual MatchResult match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span) override;
 
@@ -159,6 +166,7 @@ namespace CommonLexer
 	public:
 		NamedGroupReferenceMatcher(const std::string& name);
 		NamedGroupReferenceMatcher(std::string&& name);
+		NamedGroupReferenceMatcher(NamedGroupReferenceMatcher&& move) noexcept;
 
 		virtual MatchResult match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span) override;
 
@@ -171,6 +179,7 @@ namespace CommonLexer
 	public:
 		ReferenceMatcher(const std::string& name);
 		ReferenceMatcher(std::string&& name);
+		ReferenceMatcher(ReferenceMatcher&& move) noexcept;
 
 		virtual MatchResult match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span) override;
 
@@ -185,6 +194,7 @@ namespace CommonLexer
 	public:
 		TextMatcher(const std::string& text);
 		TextMatcher(std::string&& text);
+		TextMatcher(TextMatcher&& move) noexcept;
 
 		virtual MatchResult match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span) override;
 
@@ -197,6 +207,7 @@ namespace CommonLexer
 	public:
 		RegexMatcher(const std::string& regex);
 		RegexMatcher(std::string&& regex);
+		RegexMatcher(RegexMatcher&& move) noexcept;
 
 		virtual MatchResult match(MatcherState& state, MatcherScopedState& scopedState, SourceSpan span) override;
 
@@ -210,7 +221,7 @@ namespace CommonLexer
 
 	template <Matcher... Matchers>
 	CombinationMatcher::CombinationMatcher(Matchers&&... matchers)
-	    : m_Matchers(Details::make_unique_ptrs<IMatcher>(Tuple { std::move<Matchers>(matchers)... }))
+	    : m_Matchers(Details::make_unique_ptrs<IMatcher>(Tuple { std::move(matchers)... }))
 	{
 	}
 
@@ -222,7 +233,7 @@ namespace CommonLexer
 
 	template <Matcher... Matchers>
 	OrMatcher::OrMatcher(Matchers&&... matchers)
-	    : m_Matchers(Details::make_unique_ptrs<IMatcher>(Tuple { std::move<Matchers>(matchers)... }))
+	    : m_Matchers(Details::make_unique_ptrs<IMatcher>(Tuple { std::move(matchers)... }))
 	{
 	}
 
