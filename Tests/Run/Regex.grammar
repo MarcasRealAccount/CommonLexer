@@ -1,0 +1,54 @@
+!MainRule = Regex;
+
+Regex?: Matcher*;
+
+Depth1Matcher: OrMatcher | Depth2Matcher;
+Depth2Matcher: CombinationMatcher | Depth3Matcher;
+Depth3Matcher: ZeroOrMore;
+               OneOrMore;
+               ExactAmount;
+               RangeMatcher;
+               OptionalMatcher;
+               Depth4Matcher;
+Depth4Matcher: CharacterSet;
+               NegatedCharacterSet;
+               CaptureGroup;
+               NamedCaptureGroup;
+               Group;
+               PositiveLookahead;
+               PositiveLookbehind;
+               NegativeLookahead;
+               NegativeLookbehind;
+               Depth5Matcher;
+Depth5Matcher: Character | EscapeSequence;
+
+# Depth 1
+OrMatcher: Depth2Matcher ("|" Depth2Matcher)+;
+
+# Depth 2
+CombinationMatcher: Depth3Matcher Depth3Matcher+;
+
+# Depth 3
+ZeroOrMore:       Depth4Matcher "*" "?"?;
+OneOrMore:        Depth4Matcher "+" "?"?;
+ExactAmount:      Depth4Matcher "{" Integer "}" "?"?;
+RangeMatcher:     Depth4Matcher "{" Integer "," Integer "}" "?"?;
+OptionalMatcher:  Depth4Matcher "?";
+
+# Depth 4
+CharacterSet:        "[" ~"^"  "]";
+NegatedCharacterSet: "[^"  "]";
+CaptureGroup:        "(" Depth1Matcher ")";
+NamedCaptureGroup:   "(?<" Identifier ">" Depth1Matcher ")";
+Group:               "(?:" Depth1Matcher ")";
+PositiveLookahead:   "(?=" Depth1Matcher ")";
+PositiveLookbehind:   "(?<=" Depth1Matcher ")";
+NegativeLookahead:   "(?!" Depth1Matcher ")";
+NegativeLookbehind:   "(?<!" Depth1Matcher ")";
+
+# Depth 5
+Character:      '[^]';
+EscapeSequence: "\\" (Character | );
+
+AnchorBeginning: "^";
+AnchorEnd:       "$";

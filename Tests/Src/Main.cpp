@@ -134,7 +134,7 @@ void PrintLexNode(const CommonLexer::Node& node, std::vector<std::vector<std::st
 		layers.push_back(!end);
 
 		auto span = node.getSpan();
-		str << node.getRule();
+		str << node.getLex().getLexer()->getRule(node.getRule())->getName();
 		line.push_back(str.str());
 		str = {};
 

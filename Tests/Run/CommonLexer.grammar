@@ -1,5 +1,5 @@
 !MainRule       = File;
-!SpaceMethod    = "Whitespace"
+!SpaceMethod    = "Whitespace";
 !SpaceDirection = "Both";
 
 File?:                   Declaration,*;

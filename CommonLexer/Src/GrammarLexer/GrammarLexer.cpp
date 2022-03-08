@@ -69,7 +69,6 @@ namespace GrammarLexer
 		            false,
 		            ESpaceDirection::Both,
 		            ESpaceMethod::Whitespace),
-		        ReferenceMatcher("Identifier"),
 		        TextMatcher(";")) });
 		registerRule(MatcherRule {
 		    "RuleDeclaration",
